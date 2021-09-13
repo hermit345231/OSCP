@@ -12,6 +12,7 @@ https://sushant747.gitbooks.io/total-oscp-guide/content/windows.html
 https://www.microsoftpressstore.com/articles/article.aspx?p=2224373&seqNum=2
 https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/icacls
 https://jlajara.gitlab.io/others/2020/11/22/Potatoes_Windows_Privesc.html
+https://atom.hackstreetboys.ph/windows-privilege-escalation-service-exploits/
 
 **Tools**
 
