@@ -161,7 +161,6 @@ netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
 ```
 Psexec
 
-Password
 ```cmd
 python3 psexec.py user:password@<ip>
 ```
