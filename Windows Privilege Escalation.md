@@ -84,7 +84,7 @@ schtasks /RUN /TN "Task Name"
 - Find writable registry keys for services using Accesschk.
 ```cmd
 accesschk.exe "hostname\username" -kwsuwq hklm\system\currentcontrolset\services
-accesschk.exe "Group Name" -kwsuwq hklm\system\currentcontrolset\services
+accesschk.exe "NT AUTHORITY\INTERACTIVE" -kwsuwq hklm\system\currentcontrolset\services
 ```
 - Check query value.
 ```cmd
