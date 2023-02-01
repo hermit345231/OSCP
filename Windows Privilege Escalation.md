@@ -83,8 +83,7 @@ schtasks /RUN /TN "Task Name"
 **Insecure Service Registry Permissions**
 - Find writable registry keys for services using Accesschk.
 ```cmd
-accesschk.exe "hostname\username" -kwsuwq hklm\system\currentcontrolset\services
-accesschk.exe "NT AUTHORITY\INTERACTIVE" -kwsuwq hklm\system\currentcontrolset\services
+\accesschk.exe /accepteula -uvwqk HKLM\System\CurrentControlSet\Services\
 ```
 - Check query value.
 ```cmd
