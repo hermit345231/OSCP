@@ -30,13 +30,15 @@ _It is very often in Windows environments to discover services that run with SYS
 - You can execute the command as follows to list potentially vulnerable services. This will show list each service and the groups which have write permissions to that service. if you have an account in any of these groups then you’ve potentially got privilege escalation.
 
 ```pwsh
-accesschk.exe -uwcqv * /accepteula
+accesschk.exe -uwcqv * -accepteula
 ```
 
 - You could instead supply a group/user and it will limit output to services that group/user has write permission to.
 
 ```pwsh
-accesschk.exe -uwcqv "Group Name/User Name" * /accepteula
+accesschk.exe "Users" -uwcqv * -accepteula
+accesschk.exe "NT AUTHORITY\INTERACTIVE" -uwcqv * -accepteula
+accesschk.exe "Everyone" -uwcqv * -accepteula
 ```
 
 - The output will be the service name, the group name and the permissions that group has. Anything like _SERVICE_CHANGE_CONFIG_ or _SERVICE_ALL_ACCESS_ is a win.
@@ -119,7 +121,6 @@ schtasks /RUN /TN "Task Name"
 
 ```pwsh
 accesschk.exe "NT AUTHORITY\INTERACTIVE" -kvuqsw hklm\System\CurrentControlSet\services -accepteula
-accesschk64.exe "Authenticated Users" -kqswvu hklm\System\CurrentControlSet\services -accepteula
 accesschk64.exe "BUILTIN\Users" -kqswvu hklm\System\CurrentControlSet\services -accepteula
 accesschk64.exe "Everyone" -kqswvu hklm\System\CurrentControlSet\services -accepteula
 ```
