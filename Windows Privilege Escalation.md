@@ -8,7 +8,6 @@ https://liodeus.github.io/2020/09/18/OSCP-personal-cheatsheet.html
 https://github.com/areyou1or0/Windows
 https://git.io/JL7sx
 https://github.com/C0nd4/OSCP-Priv-Esc
-https://sushant747.gitbooks.io/total-oscp-guide/content/windows.html
 
 ### Tools
 
