@@ -365,6 +365,18 @@ https://github.com/SecWiki/windows-kernel-exploits
 https://github.com/abatchy17/WindowsExploits
 ```
 
+Compiling exploits for windows on Linux can be a bit of a hassle.
+
+```bash
+i686-w64-mingw32-gcc exploit.c -o exploit
+```
+
+For 32bit
+
+```bash
+i686-w64-mingw32-gcc 40564.c -o 40564 -lws2_32
+```
+
 ---
 
 ### Juicy Potato (Abusing the golden privileges)
